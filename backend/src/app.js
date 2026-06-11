@@ -1,0 +1,28 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import mongoSanitize from "express-mongo-sanitize";
+import rateLimit from "express-rate-limit";
+import authRoutes from "./routes/authRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
+import reportsRoutes from "./routes/reportsRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
+import ledgerRoutes from "./routes/ledgerRoutes.js";
+import { errorHandler, notFound } from "./middleware/error.js";
+
+export const app = express();
+app.use(helmet());
+app.use(cors({ origin: process.env.CORS_ORIGIN?.split(",") || "http://localhost:3000", credentials: true }));
+app.use(express.json({ limit: "10kb" }));
+app.use(mongoSanitize());
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300 }));
+if (process.env.NODE_ENV !== "test") app.use(morgan("dev"));
+app.get("/health", (_req, res) => res.json({ success: true, message: "Personal Ledger API running" }));
+app.use("/api/auth", authRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/reports", reportsRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/ledger", ledgerRoutes);
+app.use(notFound);
+app.use(errorHandler);
