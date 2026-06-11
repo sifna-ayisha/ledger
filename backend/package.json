@@ -1,6 +1,14 @@
 {
   "name": "backend",
+  "type": "module",
   "scripts": {
-  "start": "node src/server.js"
-}
+    "start": "node src/server.js"
+  },
+  
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
+    "mongoose": "^8.24.0"
+  }
 }
