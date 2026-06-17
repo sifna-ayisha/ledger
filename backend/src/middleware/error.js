@@ -7,6 +7,9 @@ export function notFound(req, _res, next) {
 }
 
 export function errorHandler(err, _req, res, _next) {
+  if (err?.message === "Not allowed by CORS") {
+    return res.status(403).json({ success: false, message: "CORS blocked this origin" });
+  }
   const statusCode = err.statusCode || (err.name === "ValidationError" ? 400 : 500);
   const errors = err.errors
     ? Object.values(err.errors).map((item) => item.message || item)
