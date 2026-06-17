@@ -46,7 +46,7 @@ export function TransactionModal({ type = "sale", initial, onClose, onSubmit, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4">
+    <div className="modal-overlay">
       <form onSubmit={handleSubmit(handleFormSubmit)} className="card w-full max-w-lg">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold">{initial ? "Edit Transaction" : isExpense ? "Add Expense" : "Add Sale"}</h2>

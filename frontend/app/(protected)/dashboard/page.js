@@ -93,7 +93,7 @@ export default function DashboardPage() {
         <h2 className="mb-4 font-bold">Recent Transactions</h2>
         <DataTable columns={columns} rows={summary.recentTransactions || []} actions={(row) => <div className="flex justify-end gap-2"><button className="btn-secondary" onClick={() => setModal({ initial: row })}><Pencil size={16} /></button><button className="btn-secondary text-red-600" onClick={() => remove(row)}><Trash2 size={16} /></button></div>} />
       </div>
-      <div className="fixed bottom-5 right-5 z-40 flex flex-col gap-3">
+      <div className="fab-group">
         <button className="btn-primary rounded-full shadow-lg" onClick={() => setModal({ type: "credit" })}><CirclePlus size={18} />Add Sale</button>
         <button className="btn-secondary rounded-full shadow-lg" onClick={() => setModal({ type: "expense" })}><CircleMinus size={18} />Add Expense</button>
       </div>

@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import mongoSanitize from "express-mongo-sanitize";
+import { mongoSanitize } from "./middleware/mongoSanitize.js";
 import rateLimit from "express-rate-limit";
 import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";

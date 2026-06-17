@@ -7,7 +7,7 @@ export function CrudModal({ title, fields, initial, onClose, onSubmit }) {
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ defaultValues: initial || {} });
   useEffect(() => { reset(initial || {}); }, [initial, reset]);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4">
+    <div className="modal-overlay">
       <form onSubmit={handleSubmit(onSubmit)} className="card w-full max-w-xl">
         <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-bold">{title}</h2><button type="button" className="btn-secondary" onClick={onClose}>Close</button></div>
         <div className="grid gap-4 sm:grid-cols-2">

@@ -2,7 +2,7 @@ import { currency } from "@/lib/format";
 
 export function StatCard({ label, value, icon: Icon, money = true }) {
   return (
-    <div className="card">
+    <div className="stat-card">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500">{label}</p>
         {Icon && <Icon className="text-brand-600" size={20} />}

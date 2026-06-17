@@ -8,7 +8,7 @@ export function LoginForm() {
   const { login } = useAuth();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
   return (
-    <form onSubmit={handleSubmit(login)} className="card w-full max-w-md bg-white text-slate-900">
+    <form onSubmit={handleSubmit(login)} className="auth-card w-full max-w-md">
       <h1 className="text-2xl font-black">Login</h1>
       <div className="mt-6 space-y-4">
         <FormField label="Email" error={errors.email}><input className="input" {...register("email", { required: "Email is required" })} /></FormField>
@@ -24,7 +24,7 @@ export function RegisterForm() {
   const { register: create } = useAuth();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({ defaultValues: { role: "owner" } });
   return (
-    <form onSubmit={handleSubmit(create)} className="card w-full max-w-md bg-white text-slate-900">
+    <form onSubmit={handleSubmit(create)} className="auth-card w-full max-w-md">
       <h1 className="text-2xl font-black">Create Account</h1>
       <div className="mt-6 space-y-4">
         <FormField label="Name" error={errors.name}><input className="input" {...register("name", { required: "Name is required" })} /></FormField>
