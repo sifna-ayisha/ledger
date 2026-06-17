@@ -1,7 +1,13 @@
 import axios from "axios";
 
+function withApiPrefix(url) {
+  const normalized = (url || "").trim().replace(/\/+$/, "");
+  if (!normalized) return "http://localhost:5000/api";
+  return normalized.endsWith("/api") ? normalized : `${normalized}/api`;
+}
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api",
+  baseURL: withApiPrefix(process.env.NEXT_PUBLIC_API_URL),
   timeout: 15000,
 });
 
