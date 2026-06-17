@@ -30,8 +30,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// Ensure preflight requests are answered
-app.options("*", cors(corsOptions));
+// Ensure preflight requests are answered (Express 5 compatible)
+app.options(/.*/, cors(corsOptions));
 app.use(express.json({ limit: "10kb" }));
 app.use(mongoSanitize());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300 }));
