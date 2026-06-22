@@ -36,6 +36,30 @@ export async function resolveUserShop(user, requestedShopId) {
   return { shops, selected };
 }
 
+export async function getShopLedgerStats(shopId) {
+  const [totals, totalEntries, recentTransactions] = await Promise.all([
+    LedgerEntry.aggregate([
+      { $match: { shopId, deletedAt: null } },
+      { $group: { _id: "$type", total: { $sum: "$amount" }, count: { $sum: 1 } } },
+    ]),
+    LedgerEntry.countDocuments({ shopId, deletedAt: null }),
+    LedgerEntry.find({ shopId, deletedAt: null }).sort({ date: -1, createdAt: -1 }).limit(10),
+  ]);
+
+  const credit = totals.find((row) => row._id === "credit") || { total: 0, count: 0 };
+  const expense = totals.find((row) => row._id === "expense") || { total: 0, count: 0 };
+
+  return {
+    totalCredit: credit.total,
+    totalExpenses: expense.total,
+    currentBalance: credit.total - expense.total,
+    creditCount: credit.count,
+    expenseCount: expense.count,
+    totalEntries,
+    recentTransactions,
+  };
+}
+
 export function serializeShops(shops, userId = null) {
   return shops.map((shop) => ({
     id: shop._id,

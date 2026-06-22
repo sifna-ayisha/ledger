@@ -3,7 +3,7 @@ import { User } from "../models/User.js";
 import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { success } from "../utils/response.js";
-import { ensureUserShops, serializeShops } from "../services/shopService.js";
+import { ensureUserShops, getShopLedgerStats, serializeShops } from "../services/shopService.js";
 
 function normalizeName(name) {
   return typeof name === "string" ? name.trim() : "";
@@ -12,6 +12,63 @@ function normalizeName(name) {
 export const listShops = asyncHandler(async (req, res) => {
   const shops = await ensureUserShops(req.user);
   success(res, "Shops loaded", { items: serializeShops(shops, req.user._id) });
+});
+
+export const listAllShops = asyncHandler(async (req, res) => {
+  const search = normalizeName(req.query.search);
+  const filter = search ? { name: { $regex: search, $options: "i" } } : {};
+
+  const shops = await Shop.find(filter)
+    .populate("ownerId", "name email role")
+    .sort({ name: 1, createdAt: 1 });
+
+  const items = shops.map((shop) => ({
+    id: shop._id,
+    name: shop.name,
+    owner: shop.ownerId
+      ? { id: shop.ownerId._id, name: shop.ownerId.name, email: shop.ownerId.email }
+      : null,
+    memberCount: shop.members?.length || 0,
+    createdAt: shop.createdAt,
+  }));
+
+  success(res, "Shops loaded", { items });
+});
+
+export const getShopDetails = asyncHandler(async (req, res) => {
+  const shop = await Shop.findById(req.params.id)
+    .populate("ownerId", "name email role")
+    .populate("members.userId", "name email role");
+
+  if (!shop) throw new ApiError(404, "Shop not found");
+
+  const stats = await getShopLedgerStats(shop._id);
+
+  const owner = shop.ownerId
+    ? { id: shop.ownerId._id, name: shop.ownerId.name, email: shop.ownerId.email, role: "owner" }
+    : null;
+
+  const members = shop.members
+    .filter((member) => member.userId)
+    .map((member) => ({
+      id: member.userId._id,
+      name: member.userId.name,
+      email: member.userId.email,
+      role: member.role,
+    }));
+
+  success(res, "Shop details loaded", {
+    shop: {
+      id: shop._id,
+      name: shop.name,
+      owner,
+      members,
+      memberCount: members.length,
+      createdAt: shop.createdAt,
+      updatedAt: shop.updatedAt,
+    },
+    stats,
+  });
 });
 
 export const createShop = asyncHandler(async (req, res) => {
