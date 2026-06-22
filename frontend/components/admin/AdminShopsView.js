@@ -1,22 +1,16 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Building2, CircleMinus, CirclePlus, IndianRupee, Mail, Receipt, Store, User, Users } from "lucide-react";
 import { api } from "@/lib/api";
 import { currency, dateInput } from "@/lib/format";
-import { useAuth } from "@/context/AuthContext";
 import { StatCard } from "@/components/ui/StatCard";
 import { DataTable } from "@/components/ui/DataTable";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 
-export default function AdminShopsPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
-  const isAdmin = user?.role === "admin";
-
+export function AdminShopsView() {
   const [shops, setShops] = useState([]);
   const [loadingShops, setLoadingShops] = useState(true);
   const [selectedShopId, setSelectedShopId] = useState("");
@@ -24,11 +18,6 @@ export default function AdminShopsPage() {
   const [loadingDetails, setLoadingDetails] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && user && !isAdmin) router.replace("/dashboard");
-  }, [authLoading, user, isAdmin, router]);
-
-  useEffect(() => {
-    if (!isAdmin) return;
     let active = true;
     (async () => {
       try {
@@ -43,7 +32,7 @@ export default function AdminShopsPage() {
     return () => {
       active = false;
     };
-  }, [isAdmin]);
+  }, []);
 
   useEffect(() => {
     if (!selectedShopId) {
@@ -94,8 +83,6 @@ export default function AdminShopsPage() {
     { key: "description", label: "Description", render: (r) => r.description || "-" },
     { key: "amount", label: "Amount", render: (r) => currency(r.amount) },
   ];
-
-  if (authLoading || !isAdmin) return <LoadingSkeleton rows={6} />;
 
   const shop = details?.shop;
   const stats = details?.stats;

@@ -39,6 +39,13 @@ export function AuthProvider({ children }) {
     router.push("/dashboard");
   };
 
+  const adminLogin = async (values) => {
+    const { data } = await api.post("/auth/admin-login", values);
+    persist(data.data);
+    toast.success("Welcome, admin");
+    router.push("/dashboard");
+  };
+
   const register = async (values) => {
     const { data } = await api.post("/auth/register", values);
     persist(data.data);
@@ -62,7 +69,7 @@ export function AuthProvider({ children }) {
     router.push("/login");
   };
 
-  const value = useMemo(() => ({ user, token, loading, login, register, logout, updateProfile, isAuthenticated: Boolean(token) }), [user, token, loading]);
+  const value = useMemo(() => ({ user, token, loading, login, adminLogin, register, logout, updateProfile, isAuthenticated: Boolean(token) }), [user, token, loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

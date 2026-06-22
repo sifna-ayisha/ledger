@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, BookOpenText, CircleMinus, CirclePlus, LayoutDashboard, Settings, Store, WalletCards } from "lucide-react";
+import { BarChart3, BookOpenText, CircleMinus, CirclePlus, LayoutDashboard, Settings, WalletCards } from "lucide-react";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -17,14 +17,11 @@ const items = [
   ["/settings", "Settings", Settings],
 ];
 
-const adminItems = [
-  ["/admin/shops", "All Shops", Store],
-];
-
 export function Sidebar({ open, setOpen }) {
   const path = usePathname();
   const { user } = useAuth();
-  const navItems = user?.role === "admin" ? [...items, ...adminItems] : items;
+  const isAdmin = user?.role === "admin";
+  const navItems = isAdmin ? items.filter(([href]) => href === "/dashboard" || href === "/settings") : items;
   const [adj, setAdj] = useState({ month: "", amount: "" });
 
   useEffect(() => {
