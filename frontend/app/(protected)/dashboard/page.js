@@ -9,14 +9,20 @@ import { DataTable } from "@/components/ui/DataTable";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { TransactionModal } from "@/components/forms/TransactionModal";
 import { useDashboard } from "@/context/DashboardContext";
+import { useAuth } from "@/context/AuthContext";
+import { AdminShopsView } from "@/components/admin/AdminShopsView";
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const { summary, analytics, refreshDashboard, setSummary } = useDashboard();
   const [modal, setModal] = useState(null);
 
   useEffect(() => {
-    refreshDashboard();
-  }, [refreshDashboard]);
+    if (!isAdmin) refreshDashboard();
+  }, [refreshDashboard, isAdmin]);
+
+  if (isAdmin) return <AdminShopsView />;
 
   const save = async (values) => {
     const formatApiError = (err) => {
