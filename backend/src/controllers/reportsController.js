@@ -13,7 +13,7 @@ async function ledgerReport(req, period = "daily") {
   const { start, end } = rangeFromQuery(req.query);
   const groupFormat = formats[period] || formats.daily;
   const rows = await LedgerEntry.aggregate([
-    { $match: { userId: req.user._id, deletedAt: null, date: { $gte: start, $lte: end } } },
+    { $match: { shopId: req.shop._id, deletedAt: null, date: { $gte: start, $lte: end } } },
     {
       $group: {
         _id: { $dateToString: { format: groupFormat, date: "$date" } },
@@ -25,6 +25,7 @@ async function ledgerReport(req, period = "daily") {
     { $sort: { _id: 1 } },
   ]);
   return {
+    shop: req.shop,
     rows: rows.map((row) => ({ period: row._id, credit: row.credit, expense: row.expense, balance: row.credit - row.expense, transactions: row.transactions })),
     range: { start, end },
   };

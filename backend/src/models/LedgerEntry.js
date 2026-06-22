@@ -13,6 +13,7 @@ const ledgerEntrySchema = new mongoose.Schema({
   description: { type: String, trim: true, required: false, default: "" },
   deletedAt: { type: Date, default: null, index: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
+  shopId: { type: mongoose.Schema.Types.ObjectId, ref: "Shop", required: false, index: true },
 }, { timestamps: true });
 
 ledgerEntrySchema.pre("validate", function normalizeCategory(next) {
@@ -20,5 +21,6 @@ ledgerEntrySchema.pre("validate", function normalizeCategory(next) {
   next();
 });
 
+ledgerEntrySchema.index({ shopId: 1, date: -1, type: 1, deletedAt: 1 });
 ledgerEntrySchema.index({ userId: 1, date: -1, type: 1, deletedAt: 1 });
 export const LedgerEntry = mongoose.model("LedgerEntry", ledgerEntrySchema);

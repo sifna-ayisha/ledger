@@ -10,6 +10,7 @@ import dashboardRoutes from "./routes/dashboardRoutes.js";
 import reportsRoutes from "./routes/reportsRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import ledgerRoutes from "./routes/ledgerRoutes.js";
+import shopRoutes from "./routes/shopRoutes.js";
 import { errorHandler, notFound } from "./middleware/error.js";
 
 export const app = express();
@@ -34,7 +35,7 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-shop-id"],
   })
 );
 
@@ -64,6 +65,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/ledger", ledgerRoutes);
+app.use("/api/shops", shopRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

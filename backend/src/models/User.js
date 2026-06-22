@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true, validate: validator.isEmail },
   password: { type: String, required: true, minlength: 6, select: false },
   shopName: { type: String, required: false, trim: true, default: "Personal Ledger" },
-  role: { type: String, enum: ["owner", "manager", "staff"], default: "owner" },
+  role: { type: String, enum: ["admin", "owner", "manager", "staff"], default: "admin" },
 }, { timestamps: true });
 
 userSchema.pre("save", async function hashPassword(next) {

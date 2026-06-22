@@ -31,8 +31,8 @@ function normalizePayload(body) {
 
 export const listLedgerEntries = asyncHandler(async (req, res) => {
   const { page, limit, skip } = pagination(req.query);
-  const filter = { userId: req.user._id, ...active, ...dateFilter(req.query), ...searchFilter(req.query) };
-  const allFilter = { userId: req.user._id, ...active };
+  const filter = { shopId: req.shop._id, ...active, ...dateFilter(req.query), ...searchFilter(req.query) };
+  const allFilter = { shopId: req.shop._id, ...active };
 
   const [allEntries, total, totals] = await Promise.all([
     LedgerEntry.find(filter).sort({ date: 1, createdAt: 1 }),
@@ -57,6 +57,7 @@ export const listLedgerEntries = asyncHandler(async (req, res) => {
 
   success(res, "Ledger loaded", {
     items: entriesWithBalance.slice(skip, skip + limit),
+    shop: req.shop,
     summary: {
       totalCredit,
       totalExpense,
@@ -67,13 +68,13 @@ export const listLedgerEntries = asyncHandler(async (req, res) => {
 });
 
 export const createLedgerEntry = asyncHandler(async (req, res) => {
-  const item = await LedgerEntry.create({ ...normalizePayload(req.body), userId: req.user._id });
+  const item = await LedgerEntry.create({ ...normalizePayload(req.body), userId: req.user._id, shopId: req.shop._id });
   success(res, "Transaction created", { item }, 201);
 });
 
 export const updateLedgerEntry = asyncHandler(async (req, res) => {
   const item = await LedgerEntry.findOneAndUpdate(
-    { _id: req.params.id, userId: req.user._id, ...active },
+    { _id: req.params.id, shopId: req.shop._id, ...active },
     normalizePayload(req.body),
     { new: true, runValidators: true },
   );
@@ -83,7 +84,7 @@ export const updateLedgerEntry = asyncHandler(async (req, res) => {
 
 export const deleteLedgerEntry = asyncHandler(async (req, res) => {
   const item = await LedgerEntry.findOneAndUpdate(
-    { _id: req.params.id, userId: req.user._id, ...active },
+    { _id: req.params.id, shopId: req.shop._id, ...active },
     { deletedAt: new Date() },
     { new: true },
   );
@@ -92,7 +93,7 @@ export const deleteLedgerEntry = asyncHandler(async (req, res) => {
 });
 
 export const groupedLedgerEntries = asyncHandler(async (req, res) => {
-  const filter = { userId: req.user._id, ...active, ...dateFilter(req.query), ...searchFilter(req.query) };
+  const filter = { shopId: req.shop._id, ...active, ...dateFilter(req.query), ...searchFilter(req.query) };
   const entries = await LedgerEntry.find(filter).sort({ date: -1, createdAt: -1 });
   const groups = entries.reduce((acc, item) => {
     const date = item.date.toISOString().slice(0, 10);
@@ -108,17 +109,17 @@ export const groupedLedgerEntries = asyncHandler(async (req, res) => {
     acc[date].balance = acc[date].totalCredit - acc[date].totalExpense;
     return acc;
   }, {});
-  success(res, "Date-wise ledger loaded", { groups: Object.values(groups) });
+  success(res, "Date-wise ledger loaded", { groups: Object.values(groups), shop: req.shop });
 });
 
 export const backupLedgerEntries = asyncHandler(async (req, res) => {
-  const items = await LedgerEntry.find({ userId: req.user._id, ...active }).sort({ date: 1, createdAt: 1 });
-  success(res, "Ledger backup ready", { items });
+  const items = await LedgerEntry.find({ shopId: req.shop._id, ...active }).sort({ date: 1, createdAt: 1 });
+  success(res, "Ledger backup ready", { items, shop: req.shop });
 });
 
 export const restoreLedgerEntries = asyncHandler(async (req, res) => {
   const items = Array.isArray(req.body.items) ? req.body.items : [];
-  const docs = items.map((item) => ({ ...normalizePayload(item), userId: req.user._id }));
+  const docs = items.map((item) => ({ ...normalizePayload(item), userId: req.user._id, shopId: req.shop._id }));
   if (docs.length) await LedgerEntry.insertMany(docs, { ordered: false });
   success(res, "Ledger restored", { count: docs.length });
 });
